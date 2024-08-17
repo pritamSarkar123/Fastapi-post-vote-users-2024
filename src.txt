@@ -1,0 +1,10 @@
+original code and deployment in heroku and ubuntu 
+https://github.com/Sanjeev-Thiyagarajan/fastapi-course
+
+
+check the modified github workflow file
+https://github.com/Sanjeev-Thiyagarajan/fastapi-course/blob/main/.github/workflows/build-deploy.yml
+
+it does not cover initial deployment in ubuntu and in heruku, you have to do it manually,
+but after that it is completely managed by the workflow
+as I do not have heroku and digital ocean access, I have not added those deployment jobs in workflow
