@@ -1,0 +1,105 @@
+alembic --help
+
+// need to start alembic
+alembic init alembic
+
+// avail db Base object of models **** not from database
+// [database has also Base objects but ,
+// Base object of models will alow alambic to read all of those models]
+// to env.py in alembic
+1. 
+from app.models import Base 
+
+2. 
+target_metadata = Base.metadata
+
+
+// ********
+// default driver for PG psycopg2, if we provide "postgresql://postgres:root@localhost:5433/fastapi"
+// then it will automatically consider psycopg2 as default driver and make the url as 
+// postgresql+psycopg2://postgres:root@localhost:5433/fastapi
+// ********
+
+// provide sqlalchemy.url (including driver name (psycopg2)) in alembic.ini 
+sqlalchemy.url = postgresql+psycopg2://postgres:root@localhost:5433/fastapi
+
+// will be overwritten soon, so we can keep it blank
+
+// but this is static and not good, so we need to overwrite the sqlalchemy.url value in alembic.ini
+// using config.set_main_option() in env.py
+1.
+from app.config import settings
+
+2.
+config.set_main_option(
+    "sqlalchemy.url",
+    f"postgresql+psycopg2://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}",
+)
+
+// when we want to make change in database, then we need to do the revision
+// alembic rivision tracks all the changes
+
+eg:
+alembic revision -m "create post table"
+
+// one revision file will be created in the versions in alembic 
+// contains upgrade and downgrade functions
+// https://alembic.sqlalchemy.org/en/latest/api/ddl.html
+
+
+// current alembic revision number
+alembic current 
+
+// you need to comment the following line from the main.py
+// to start all tables from begining
+********
+models.Base.metadata.create_all(bind=engine)
+
+// upgrade with rivision number
+alembic upgrade a8e274a10363 (all the rivisions are updated between current rev and mentioned rev like linked list)
+
+// adding new column content
+alembic revision -m "add content column to posts table"
+
+// check up and down revision of all the revisions ***
+
+alembic current // currently updated revision no
+alembic heads // latest revision no ,current rev (not always ==) latest rev
+
+alembic upgrade head // update up to the latest revision (all the rivisions are updated between current rev and head rev)
+// above command will also include all not updated revisions untill it reaches to the head
+
+// to rollback
+alembic downgrade <down rev no>
+alembic downgrade -<n> {internal revisions are also downgraded}
+alembic upgrade +<n> {internal revisions are also updated}
+// create uusers table
+
+// checking entire history 
+alembic history
+
+alembic revision -m "add foreign key to post table"
+
+// autogenerate 
+alembic revision --autogenerate -m "auto vote"
+
+
+// alembic will not detect 
+// relationship() from sql alchemy
+// as sqlalchemy models handles it 
+// it is not any db property
+
+
+
+# Note
+update time 
+    1st create column 
+    2nd create constraint 
+downgrade time 
+    1st drop constraint
+    2nd drop column 
+    # other wise conflict and error may occur
+
+# Note 
+alembic is for incremental change tracker 
+alembic is for decremental change tracker

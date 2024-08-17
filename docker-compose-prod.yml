@@ -1,0 +1,41 @@
+version: "3.7"
+
+services:
+  fastapi-post-app:
+    image: pritamsarkardocker/fastapi-post-app-2024
+    ports:
+      - "80:8000"
+    command: python startapp.py --host 0.0.0.0 --port 8000
+    environment:
+      - DATABASE_HOSTNAME=fastapi-post-app-postgres
+      - DATABASE_PORT=5433
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - REFRESH_TOKEN_EXPIRE_MINUTES=${REFRESH_TOKEN_EXPIRE_MINUTES}
+      - REDIS_HOST=fastapi-post-app-redis
+      - REDIS_PORT=6379
+    depends_on:
+      - fastapi-post-app-redis
+      - fastapi-post-app-postgres
+  
+  fastapi-post-app-postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - fastapi-post-app-postgres-db:/var/lib/postgresql/data
+  
+  fastapi-post-app-redis:
+    image: redis
+    ports:
+      - "6379:6379"
+volumes:
+  fastapi-post-app-postgres-db:

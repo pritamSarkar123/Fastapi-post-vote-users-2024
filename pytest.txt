@@ -1,0 +1,3 @@
+pytest -v 
+pytest -v -s 
+pytest --disable-warnings -v tests\test_users.py -s -x
